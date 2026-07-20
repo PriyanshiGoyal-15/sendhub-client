@@ -1,4 +1,5 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { FaWhatsapp } from "react-icons/fa";
 import {
@@ -12,17 +13,18 @@ import {
 } from "react-icons/md";
 
 const navItems = [
-  { name: "Dashboard", icon: MdOutlineDashboard, active: true },
-  { name: "Contacts", icon: MdOutlineContacts, active: false },
-  { name: "Campaigns", icon: MdOutlineCampaign, active: false },
-  { name: "Templates", icon: MdOutlineDescription, active: false },
-  { name: "Inbox", icon: MdOutlineChat, active: false },
-  { name: "Analytics", icon: MdOutlineAnalytics, active: false },
-  { name: "Settings", icon: MdOutlineSettings, active: false },
+  { name: "Dashboard", path: "/", icon: MdOutlineDashboard },
+  { name: "Contacts", path: "/contacts", icon: MdOutlineContacts },
+  { name: "Campaigns", path: "/campaigns", icon: MdOutlineCampaign },
+  { name: "Templates", path: "/templates", icon: MdOutlineDescription },
+  { name: "Inbox", path: "/inbox", icon: MdOutlineChat },
+  { name: "Analytics", path: "/analytics", icon: MdOutlineAnalytics },
+  { name: "Settings", path: "/settings", icon: MdOutlineSettings },
 ];
 
 function Sidebar() {
   const { user } = useAuth();
+  const location = useLocation();
 
   // A helper to generate initials from the user's name
   const getInitials = (name) => {
@@ -48,22 +50,27 @@ function Sidebar() {
 
         {/* Navigation Links */}
         <div className="px-4 py-6 space-y-1">
-          {navItems.map((item) => (
-            <a
-              key={item.name}
-              href="#"
-              className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                item.active
-                  ? "bg-green-200/50 text-green-800"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              <item.icon
-                className={`mr-3 text-xl ${item.active ? "text-green-700" : "text-gray-500"}`}
-              />
-              {item.name}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const isActive =
+              location.pathname === item.path ||
+              (item.path !== "/" && location.pathname.startsWith(item.path));
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                  isActive
+                    ? "bg-green-200/50 text-green-800"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                <item.icon
+                  className={`mr-3 text-xl ${isActive ? "text-green-700" : "text-gray-500"}`}
+                />
+                {item.name}
+              </Link>
+            );
+          })}
         </div>
       </div>
 
