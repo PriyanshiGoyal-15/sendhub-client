@@ -9,7 +9,6 @@ export const useTemplateStore = create(
       loading: false,
       error: null,
 
-      // Pagination & Search state
       currentPage: 1,
       rowsPerPage: 10,
       totalPages: 1,
@@ -35,7 +34,8 @@ export const useTemplateStore = create(
       fetchTemplates: async () => {
         set({ loading: true, error: null });
         try {
-          const { currentPage, rowsPerPage, searchQuery, activeCategory } = get();
+          const { currentPage, rowsPerPage, searchQuery, activeCategory } =
+            get();
           const params = new URLSearchParams({
             page: currentPage,
             limit: rowsPerPage,
@@ -118,6 +118,6 @@ export const useTemplateStore = create(
     }),
     {
       name: "template-store",
-    }
-  )
+    },
+  ),
 );

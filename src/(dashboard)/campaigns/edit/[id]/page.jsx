@@ -11,6 +11,7 @@ export default function EditCampaignPage() {
   const navigate = useNavigate();
   const { getCampaign } = useCampaignStore();
   const { addToast } = useToast();
+
   const [initialData, setInitialData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +21,7 @@ export default function EditCampaignPage() {
       try {
         const campaign = await getCampaign(id);
         if (!isMounted) return;
-        
+
         // Map backend campaign format back to the UI format for the wizard
         let date = "";
         let time = "";
@@ -46,9 +47,9 @@ export default function EditCampaignPage() {
         if (isMounted) setLoading(false);
       }
     };
-    
+
     fetchCampaign();
-    
+
     return () => {
       isMounted = false;
     };
@@ -62,5 +63,11 @@ export default function EditCampaignPage() {
     );
   }
 
-  return <CreateCampaignLayout editMode={true} campaignId={id} initialData={initialData} />;
+  return (
+    <CreateCampaignLayout
+      editMode={true}
+      campaignId={id}
+      initialData={initialData}
+    />
+  );
 }

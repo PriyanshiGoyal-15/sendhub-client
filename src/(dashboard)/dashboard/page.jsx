@@ -1,24 +1,50 @@
-export default function DashboardHome() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Dashboard Overview</h1>
-      <p>Welcome back! This is your main dashboard page.</p>
+import React, { useEffect } from "react";
+import DashboardHeader from "../../components/features/dashboard/DashboardHeader";
+import StatCards from "../../components/features/dashboard/StatCards";
+import DailyMessagesChart from "../../components/features/dashboard/DailyMessagesChart";
+import MessageStatusChart from "../../components/features/dashboard/MessageStatusChart";
+import RecentActivity from "../../components/features/dashboard/RecentActivity";
+import QuickStats from "../../components/features/dashboard/QuickStats";
+import { useDashboardStore } from "../../store/DashboardStore";
 
-      {/* Example placeholder cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-        <div className="bg-white p-6 rounded-lg border shadow-sm">
-          <h3 className="text-gray-500 text-sm font-medium">Total Contacts</h3>
-          <p className="text-3xl font-bold mt-2">0</p>
+export default function DashboardHome() {
+  const { fetchAll, isLoading } = useDashboardStore();
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-full">
+      <div className="max-w-screen">
+        <DashboardHeader />
+
+        <StatCards />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-2">
+            <DailyMessagesChart />
+          </div>
+          <div className="lg:col-span-1">
+            <MessageStatusChart />
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-lg border shadow-sm">
-          <h3 className="text-gray-500 text-sm font-medium">
-            Active Campaigns
-          </h3>
-          <p className="text-3xl font-bold mt-2">0</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg border shadow-sm">
-          <h3 className="text-gray-500 text-sm font-medium">Messages Sent</h3>
-          <p className="text-3xl font-bold mt-2">0</p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-12">
+          <div className="lg:col-span-2">
+            <RecentActivity />
+          </div>
+          <div className="lg:col-span-1">
+            <QuickStats />
+          </div>
         </div>
       </div>
     </div>

@@ -186,12 +186,12 @@ export default function ContactsTable({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-3 text-gray-400">
-                        <button
+                        {/* <button
                           className="hover:text-blue-500 transition-colors"
                           title="Chat"
                         >
                           <MdOutlineChat className="text-lg" />
-                        </button>
+                        </button> */}
                         <button
                           onClick={() => onEdit(contact)}
                           className="hover:text-gray-700 transition-colors"
