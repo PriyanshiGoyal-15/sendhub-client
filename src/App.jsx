@@ -11,6 +11,8 @@ import "./App.css";
 // Placeholder pages for sidebar items
 import Contacts from "./(dashboard)/contacts/page";
 import Campaigns from "./(dashboard)/campaigns/page";
+import CreateCampaignPage from "./(dashboard)/campaigns/create/page";
+import EditCampaignPage from "./(dashboard)/campaigns/edit/[id]/page";
 import Templates from "./(dashboard)/templates/page";
 import Inbox from "./(dashboard)/inbox/page";
 import Analytics from "./(dashboard)/analytics/page";
@@ -37,6 +39,8 @@ function App() {
         <Route index element={<DashboardHome />} />
         <Route path="contacts" element={<Contacts />} />
         <Route path="campaigns" element={<Campaigns />} />
+        <Route path="campaigns/create" element={<CreateCampaignPage />} />
+        <Route path="campaigns/edit/:id" element={<EditCampaignPage />} />
         <Route path="templates" element={<Templates />} />
         <Route path="inbox" element={<Inbox />} />
         <Route path="analytics" element={<Analytics />} />

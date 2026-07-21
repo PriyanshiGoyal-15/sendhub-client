@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useSettingStore } from "../../store/SettingStore";
 import {
   MdOutlineSearch,
   MdOutlineNotifications,
@@ -9,9 +10,19 @@ import {
 
 function Topbar() {
   const { user, logout } = useAuth();
+  const { settings, fetchSettings } = useSettingStore();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!settings) {
+      fetchSettings();
+    }
+  }, [settings, fetchSettings]);
+
+  const displayName = settings?.senderName || user?.name || "John Doe";
+  const displayEmail = settings?.email || user?.email;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -41,7 +52,7 @@ function Topbar() {
   };
 
   return (
-    <div className="fixed top-0 left-64 right-0 h-fit p-3 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-10">
+    <div className="sticky top-0 w-full p-3 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-10">
       {/* Left: Search Bar */}
       <div className="flex-1 max-w-lg">
         <div className="relative">
@@ -72,7 +83,7 @@ function Topbar() {
             className="h-10 w-10 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold flex-shrink-0 hover:ring-2 hover:ring-offset-2 hover:ring-primary transition-all"
             title="Profile"
           >
-            {getInitials(user?.name || "John Doe")}
+            {getInitials(displayName)}
           </button>
 
           {/* Dropdown Menu */}
@@ -80,9 +91,9 @@ function Topbar() {
             <div className="absolute right-0 mt-2 w-56 bg-white text-gray-900 rounded-lg shadow-lg py-1 z-20 border border-gray-50">
               <div className="px-4 py-3 border-b border-gray-100">
                 <p className="text-sm font-semibold text-gray-900">
-                  {user?.name}
+                  {displayName}
                 </p>
-                <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+                <p className="text-sm text-gray-500 truncate">{displayEmail}</p>
               </div>
               <button
                 onClick={handleLogout}

@@ -1,8 +1,11 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import api from "../api/axios";
 
-export const useContactStore = create((set, get) => ({
-  contacts: [],
+export const useContactStore = create(
+  persist(
+    (set, get) => ({
+      contacts: [],
   filters: [],
   statuses: [],
   tags: [],
@@ -240,4 +243,4 @@ export const useContactStore = create((set, get) => ({
       throw err;
     }
   },
-}));
+}), { name: "contact-store" }));

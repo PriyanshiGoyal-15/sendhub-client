@@ -1,8 +1,14 @@
+"use client";
+
+import React from "react";
+import CampaignHeader from "../../components/features/campaign/CampaignHeader";
+import CampaignList from "../../components/features/campaign/CampaignList";
+
 export default function Campaigns() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Campaigns</h1>
-      <p>Campaigns page content will go here.</p>
+    <div className="min-h-screen bg-gray-50/50">
+      <CampaignHeader />
+      <CampaignList />
     </div>
   );
 }
