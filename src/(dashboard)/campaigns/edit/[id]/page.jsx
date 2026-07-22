@@ -33,9 +33,10 @@ export default function EditCampaignPage() {
 
         setInitialData({
           name: campaign.name,
-          type: "Marketing Message", // Defaulting since we don't store this in DB
-          template: null, // Since we don't store this in DB, we could mock it
-          audienceTags: [], // Mocking tags
+          type: "Marketing Message",
+          template: campaign.template || null,
+          audienceTags: campaign.audienceTags || [],
+          variables: campaign.variables || {},
           date: date,
           time: time,
         });

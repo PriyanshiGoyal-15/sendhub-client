@@ -28,6 +28,7 @@ export default function CreateCampaignLayout({
       type: "]",
       template: null,
       audienceTags: [],
+      variables: {},
       date: "",
       time: "",
       status: "Draft",
@@ -36,25 +37,7 @@ export default function CreateCampaignLayout({
 
   const isInitialMount = useRef(true);
 
-  useEffect(() => {
-    if (!editMode && !localCampaignId) {
-      const initDraft = async () => {
-        try {
-          setIsSaving(true);
-          const data = await createCampaign({
-            name: "Untitled Campaign",
-            status: "Draft",
-          });
-          setLocalCampaignId(data.campaign._id);
-          setIsSaving(false);
-          setIsSaved(true);
-        } catch (error) {
-          console.error("Failed to init draft", error);
-        }
-      };
-      initDraft();
-    }
-  }, [editMode, localCampaignId, createCampaign]);
+  // Removed on-mount creation to prevent blank "Untitled Campaign"s
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -62,7 +45,7 @@ export default function CreateCampaignLayout({
       return;
     }
 
-    if (!editMode && localCampaignId) {
+    if (!editMode && localCampaignId && currentStep < 3) {
       setIsSaving(true);
       setIsSaved(false);
 
@@ -84,9 +67,39 @@ export default function CreateCampaignLayout({
     }
   }, [formData, editMode, localCampaignId, updateCampaign]);
 
-  const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
+  const handleNext = async () => {
+    if (currentStep === 1 && !editMode && !localCampaignId) {
+      if (!formData.name || !formData.name.trim()) {
+        addToast("Please enter a campaign name first.", "error");
+        return;
+      }
+      setIsSaving(true);
+      try {
+        const data = await createCampaign({
+          ...formData,
+          status: "Draft",
+        });
+        setLocalCampaignId(data.campaign._id);
+        setIsSaving(false);
+        setIsSaved(true);
+        setCurrentStep(2);
+      } catch (error) {
+        setIsSaving(false);
+        addToast("Failed to create campaign draft", "error");
+      }
+    } else {
+      setCurrentStep((prev) => Math.min(prev + 1, 3));
+    }
+  };
   const handleBack = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
-  const updateData = (data) => setFormData((prev) => ({ ...prev, ...data }));
+  const updateData = (newData) => {
+    console.log("=== updateData CALLED WITH ===", newData);
+    setFormData((prev) => {
+      const merged = { ...prev, ...newData };
+      console.log("=== NEW formData STATE ===", merged);
+      return merged;
+    });
+  };
 
   const handleSaveDraft = async () => {
     setIsSaving(true);

@@ -45,30 +45,36 @@ export default function ScheduleSend({
     return true;
   };
 
-  const handleCreate = async (status) => {
-    if (!validateDateTime()) return;
+  const handleCreate = async (isImmediate) => {
+    let startDate;
+
+    if (isImmediate) {
+      startDate = new Date();
+    } else {
+      if (!validateDateTime()) return;
+      startDate = new Date(`${data.date}T${data.time}`);
+    }
 
     setIsSubmitting(true);
     try {
-      const startDate = new Date(`${data.date}T${data.time}`);
-      // Generate a mock audience size based on number of tags
-      const audienceSize = Math.max(data.audienceTags.length * 1500, 500);
-
       const payload = {
         ...data,
         name: data.name,
-        status: status,
+        status: "Scheduled",
         startDate: startDate,
-        audience: audienceSize,
+        audience: 0, // Backend cron job will populate this with the exact count
       };
-
-      // Since a draft is already created via auto-save, we just update it
+      
+      console.log("=== FRONTEND PAYLOAD ===", payload);
+      
       if (campaignId) {
         await updateCampaign(campaignId, payload);
         addToast(
           editMode
             ? "Campaign updated successfully!"
-            : "Campaign created successfully!",
+            : isImmediate
+              ? "Campaign queued for sending!"
+              : "Campaign scheduled successfully!",
           "success",
         );
       } else {
@@ -199,7 +205,7 @@ export default function ScheduleSend({
             Save Draft
           </button>
           <button
-            onClick={() => handleCreate("Running")}
+            onClick={() => handleCreate(true)}
             disabled={isSubmitting}
             className="bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white px-6 py-2 rounded-lg font-medium transition-colors"
           >
@@ -212,7 +218,7 @@ export default function ScheduleSend({
                 : "Send Now"}
           </button>
           <button
-            onClick={() => handleCreate("Scheduled")}
+            onClick={() => handleCreate(false)}
             disabled={isSubmitting}
             className="bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-white px-6 py-2 rounded-lg font-medium transition-colors"
           >

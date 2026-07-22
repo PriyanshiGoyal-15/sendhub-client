@@ -100,6 +100,63 @@ export default function TemplateAudience({
             ))}
           </div>
         )}
+
+        {/* Dynamic Variable Inputs */}
+        {(() => {
+          if (!data.template) return null;
+
+          // Dynamically extract variables from content e.g. {{1}}, {{2}}
+          const extractedMatches =
+            data.template.content?.match(/\{\{\d+\}\}/g) || [];
+          const uniqueVars = [...new Set(extractedMatches)].sort();
+
+          if (uniqueVars.length === 0) return null;
+
+          return (
+            <div className="mt-6 border-t pt-6">
+              <h3 className="text-md font-bold text-gray-900 mb-3">
+                Template Variables
+              </h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Fill in the values for this campaign's variables.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {uniqueVars.map((v, idx) => {
+                  const varNumber = v.replace(/[{}]/g, "");
+                  // Fallback if the database didn't save the variable names array
+                  const varName =
+                    data.template.variables &&
+                    data.template.variables[varNumber - 1]
+                      ? data.template.variables[varNumber - 1]
+                      : `Variable ${varNumber}`;
+
+                  return (
+                    <div key={v} className="flex flex-col">
+                      <label className="text-sm font-medium text-gray-700 mb-1">{`{{${varNumber}}} - ${varName}`}</label>
+                      <input
+                        type="text"
+                        placeholder={`Enter value for ${varName}`}
+                        value={
+                          data.variables
+                            ? data.variables[String(varNumber)] ||
+                              data.variables[varNumber] ||
+                              ""
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const newVars = { ...(data.variables || {}) };
+                          newVars[String(varNumber)] = e.target.value;
+                          updateData({ variables: newVars });
+                        }}
+                        className="p-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none text-sm"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

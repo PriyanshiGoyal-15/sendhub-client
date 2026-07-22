@@ -82,8 +82,8 @@ export default function CampaignCard({ campaign }) {
             {getStatusBadge(campaign.status)}
           </div>
           <p className="text-sm text-gray-500">
-            {campaign.startDate ? formatDate(campaign.startDate) : "—"} &rarr;{" "}
-            {campaign.endDate ? formatDate(campaign.endDate) : ""}
+            {campaign.createdAt ? formatDate(campaign.createdAt) : "—"} &rarr;{" "}
+            {campaign.startDate ? formatDate(campaign.startDate) : "—"}
           </p>
         </div>
         <div className="relative" ref={menuRef}>
@@ -125,13 +125,26 @@ export default function CampaignCard({ campaign }) {
         <div className="flex justify-between text-sm text-gray-500 mb-1">
           <span>Progress</span>
           <span className="font-medium text-gray-900">
-            {campaign.progress || 0}%
+            {campaign.status === "Completed"
+              ? 100
+              : campaign.audience > 0
+                ? Math.round((campaign.sent / campaign.audience) * 100)
+                : 0}
+            %
           </span>
         </div>
         <div className="w-full bg-gray-100 rounded-full h-1.5">
           <div
-            className={`h-1.5 rounded-full ${campaign.status === "Draft" ? "bg-gray-300" : "bg-green-500"}`}
-            style={{ width: `${campaign.progress || 0}%` }}
+            className={`h-1.5 rounded-full ${
+              campaign.status === "Draft"
+                ? "bg-gray-300"
+                : campaign.status === "Scheduled"
+                  ? "bg-yellow-400"
+                  : "bg-green-500"
+            }`}
+            style={{
+              width: `${campaign.status === "Completed" ? 100 : campaign.audience > 0 ? Math.round((campaign.sent / campaign.audience) * 100) : 0}%`,
+            }}
           ></div>
         </div>
       </div>
@@ -167,13 +180,19 @@ export default function CampaignCard({ campaign }) {
         <div className="text-gray-500">
           Delivery:{" "}
           <span className="font-semibold text-gray-900">
-            {campaign.deliveryRate || 0}%
+            {campaign.audience > 0
+              ? Math.round((campaign.sent / campaign.audience) * 100)
+              : 0}
+            %
           </span>
         </div>
         <div className="text-gray-500">
           Read Rate:{" "}
           <span className="font-semibold text-gray-900">
-            {campaign.readRate || 0}%
+            {campaign.sent > 0
+              ? Math.round((campaign.read / campaign.sent) * 100)
+              : 0}
+            %
           </span>
         </div>
       </div>

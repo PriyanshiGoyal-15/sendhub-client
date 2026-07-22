@@ -9,6 +9,13 @@ export default function CampaignList() {
   useEffect(() => {
     fetchFilters();
     fetchCampaigns();
+
+    // Auto-refresh campaigns every 10 seconds for real-time status updates
+    const interval = setInterval(() => {
+      fetchCampaigns();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (loading && campaigns.length === 0) {
