@@ -15,19 +15,32 @@ export default function DailyMessagesChart() {
   const { dailyMessages } = useDashboardStore();
 
   const data = useMemo(() => {
-    if (!dailyMessages || dailyMessages.length === 0) return [];
-    
-    return dailyMessages.map(item => {
-      // item._id.date is format "YYYY-MM-DD"
-      const date = new Date(item._id.date);
-      const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      return {
+    const last7Days = [];
+    const today = new Date();
+
+    for (let i = 6; i >= 0; i--) {
+      const targetDate = new Date();
+      targetDate.setDate(today.getDate() - i);
+
+      const formattedDate = targetDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      const utcDateStr = targetDate.toISOString().split("T")[0];
+
+      const found = dailyMessages?.find(
+        (item) => item._id?.date === utcDateStr,
+      );
+
+      last7Days.push({
         name: formattedDate,
-        sent: item.sent,
-        delivered: item.delivered,
-        read: item.read
-      };
-    });
+        sent: found ? found.sent : 0,
+        delivered: found ? found.delivered : 0,
+        read: found ? found.read : 0,
+      });
+    }
+
+    return last7Days;
   }, [dailyMessages]);
 
   return (

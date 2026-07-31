@@ -16,8 +16,10 @@ export default function ScheduleSend({
   const { createCampaign, updateCampaign } = useCampaignStore();
   const { addToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activePreset, setActivePreset] = useState(null);
 
   const setPresetTime = (preset) => {
+    setActivePreset(preset);
     const dateObj = new Date();
     if (preset === "15m") {
       dateObj.setMinutes(dateObj.getMinutes() + 15);
@@ -64,9 +66,9 @@ export default function ScheduleSend({
         startDate: startDate,
         audience: 0, // Backend cron job will populate this with the exact count
       };
-      
+
       console.log("=== FRONTEND PAYLOAD ===", payload);
-      
+
       if (campaignId) {
         await updateCampaign(campaignId, payload);
         addToast(
@@ -95,6 +97,15 @@ export default function ScheduleSend({
     }
   };
 
+  const isTimeNearNow = () => {
+    if (!data.date || !data.time) return true;
+    const selectedDate = new Date(`${data.date}T${data.time}`);
+    const now = new Date();
+    // Check if the selected time is within 5 minutes of current time
+    const diffInMinutes = Math.abs((selectedDate - now) / (1000 * 60));
+    return diffInMinutes <= 5;
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col h-full">
       <h2 className="text-lg font-bold text-gray-900 mb-6">
@@ -110,8 +121,11 @@ export default function ScheduleSend({
             <input
               type="date"
               value={data.date}
-              onChange={(e) => updateData({ date: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              onChange={(e) => {
+                setActivePreset(null);
+                updateData({ date: e.target.value });
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-900"
             />
           </div>
         </div>
@@ -124,21 +138,33 @@ export default function ScheduleSend({
               <button
                 type="button"
                 onClick={() => setPresetTime("now")}
-                className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors border ${
+                  activePreset === "now"
+                    ? "bg-green-100 text-green-700 border-green-200"
+                    : "bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200"
+                }`}
               >
                 Now
               </button>
               <button
                 type="button"
                 onClick={() => setPresetTime("15m")}
-                className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors border ${
+                  activePreset === "15m"
+                    ? "bg-green-100 text-green-700 border-green-200"
+                    : "bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200"
+                }`}
               >
                 +15 min
               </button>
               <button
                 type="button"
                 onClick={() => setPresetTime("1h")}
-                className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors border ${
+                  activePreset === "1h"
+                    ? "bg-green-100 text-green-700 border-green-200"
+                    : "bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200"
+                }`}
               >
                 +1 hr
               </button>
@@ -147,7 +173,10 @@ export default function ScheduleSend({
               <input
                 type="time"
                 value={data.time}
-                onChange={(e) => updateData({ time: e.target.value })}
+                onChange={(e) => {
+                  setActivePreset(null);
+                  updateData({ time: e.target.value });
+                }}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -179,7 +208,7 @@ export default function ScheduleSend({
           <div>
             <p className="text-gray-500 mb-1">Scheduled</p>
             <p className="font-medium text-gray-900">
-              {data.date && data.time
+              {data.date && data.time && !isTimeNearNow()
                 ? `${data.date} at ${data.time}`
                 : "Send immediately"}
             </p>
@@ -206,8 +235,8 @@ export default function ScheduleSend({
           </button>
           <button
             onClick={() => handleCreate(true)}
-            disabled={isSubmitting}
-            className="bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+            disabled={isSubmitting || !isTimeNearNow()}
+            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors"
           >
             {isSubmitting
               ? editMode
@@ -219,8 +248,8 @@ export default function ScheduleSend({
           </button>
           <button
             onClick={() => handleCreate(false)}
-            disabled={isSubmitting}
-            className="bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+            disabled={isSubmitting || isTimeNearNow()}
+            className="bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors"
           >
             {isSubmitting
               ? editMode

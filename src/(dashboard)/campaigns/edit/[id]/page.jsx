@@ -27,8 +27,14 @@ export default function EditCampaignPage() {
         let time = "";
         if (campaign.startDate) {
           const d = new Date(campaign.startDate);
-          date = d.toISOString().split("T")[0];
-          time = d.toISOString().split("T")[1].substring(0, 5);
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          date = `${year}-${month}-${day}`;
+
+          const hours = String(d.getHours()).padStart(2, "0");
+          const minutes = String(d.getMinutes()).padStart(2, "0");
+          time = `${hours}:${minutes}`;
         }
 
         setInitialData({

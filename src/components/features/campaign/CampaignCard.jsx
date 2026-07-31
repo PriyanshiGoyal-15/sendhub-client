@@ -5,6 +5,13 @@ import { useToast } from "../../../components/UI/toast";
 import { useCampaignStore } from "../../../store/CampaignStore";
 
 export default function CampaignCard({ campaign }) {
+  const navigate = useNavigate();
+  const { addToast } = useToast();
+  const { deleteCampaign } = useCampaignStore();
+  const [showMenu, setShowMenu] = useState(false);
+  const [timeLeft, setTimeLeft] = useState("");
+  const menuRef = useRef(null);
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "Running":
@@ -15,13 +22,20 @@ export default function CampaignCard({ campaign }) {
         );
       case "Scheduled":
         return (
-          <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full">
-            Scheduled
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full">
+              Scheduled
+            </span>
+            {timeLeft && (
+              <span className="text-xs text-yellow-600 font-medium bg-yellow-50 px-2 py-0.5 rounded-md border border-yellow-200 flex items-center gap-1 shadow-sm">
+                ⏱ {timeLeft}
+              </span>
+            )}
+          </div>
         );
       case "Draft":
         return (
-          <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
+          <span className="px-2 py-1 bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold rounded-full shadow-sm">
             Draft
           </span>
         );
@@ -29,6 +43,12 @@ export default function CampaignCard({ campaign }) {
         return (
           <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
             Completed
+          </span>
+        );
+      case "Failed":
+        return (
+          <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+            Failed
           </span>
         );
       default:
@@ -44,12 +64,6 @@ export default function CampaignCard({ campaign }) {
     if (!dateStr) return "—";
     return new Date(dateStr).toISOString().split("T")[0];
   };
-
-  const navigate = useNavigate();
-  const { addToast } = useToast();
-  const { deleteCampaign } = useCampaignStore();
-  const [showMenu, setShowMenu] = useState(false);
-  const menuRef = useRef(null);
 
   const handleDelete = async () => {
     try {
@@ -72,6 +86,37 @@ export default function CampaignCard({ campaign }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (campaign.status !== "Scheduled" || !campaign.startDate) return;
+
+    const updateTimer = () => {
+      const now = new Date();
+      const start = new Date(campaign.startDate);
+      const diffMs = start - now;
+
+      if (diffMs <= 0) {
+        setTimeLeft("Delivering soon...");
+        return;
+      }
+
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 60) {
+        setTimeLeft(`in ${diffMins} min${diffMins !== 1 ? "s" : ""}`);
+      } else if (diffMins < 24 * 60) {
+        const diffHours = Math.floor(diffMins / 60);
+        const remainingMins = diffMins % 60;
+        setTimeLeft(`in ${diffHours}h ${remainingMins}m`);
+      } else {
+        const diffDays = Math.floor(diffMins / (24 * 60));
+        setTimeLeft(`in ${diffDays} day${diffDays !== 1 ? "s" : ""}`);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 60000);
+    return () => clearInterval(interval);
+  }, [campaign.status, campaign.startDate]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col gap-4">
@@ -127,9 +172,15 @@ export default function CampaignCard({ campaign }) {
           <span className="font-medium text-gray-900">
             {campaign.status === "Completed"
               ? 100
-              : campaign.audience > 0
-                ? Math.round((campaign.sent / campaign.audience) * 100)
-                : 0}
+              : campaign.status === "Failed"
+                ? 100
+                : campaign.status === "Scheduled"
+                  ? 20
+                  : campaign.status === "Draft"
+                    ? 5
+                    : campaign.audience > 0
+                      ? Math.round((campaign.sent / campaign.audience) * 100)
+                      : 0}
             %
           </span>
         </div>
@@ -137,13 +188,15 @@ export default function CampaignCard({ campaign }) {
           <div
             className={`h-1.5 rounded-full ${
               campaign.status === "Draft"
-                ? "bg-gray-300"
+                ? "bg-slate-400"
                 : campaign.status === "Scheduled"
                   ? "bg-yellow-400"
-                  : "bg-green-500"
+                  : campaign.status === "Failed"
+                    ? "bg-red-500"
+                    : "bg-green-500"
             }`}
             style={{
-              width: `${campaign.status === "Completed" ? 100 : campaign.audience > 0 ? Math.round((campaign.sent / campaign.audience) * 100) : 0}%`,
+              width: `${campaign.status === "Completed" || campaign.status === "Failed" ? 100 : campaign.status === "Scheduled" ? 20 : campaign.status === "Draft" ? 5 : campaign.audience > 0 ? Math.round((campaign.sent / campaign.audience) * 100) : 0}%`,
             }}
           ></div>
         </div>
