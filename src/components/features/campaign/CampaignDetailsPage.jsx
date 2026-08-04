@@ -17,7 +17,7 @@ import api from "../../../api/axios";
 
 export default function CampaignDetailsPage({ campaignId, initialData }) {
   const navigate = useNavigate();
-  const { updateCampaign } = useCampaignStore();
+  const { updateCampaign, createCampaign } = useCampaignStore();
   const { addToast } = useToast();
 
   const [logs, setLogs] = useState([]);
@@ -64,14 +64,36 @@ export default function CampaignDetailsPage({ campaignId, initialData }) {
 
   const handleReschedule = async () => {
     try {
-      await updateCampaign(campaignId, { status: "Draft" });
+      const {
+        _id,
+        id,
+        createdAt,
+        updatedAt,
+        __v,
+        sent,
+        failed,
+        audience,
+        startDate,
+        failureReason,
+        ...rest
+      } = initialData;
+
+      const newCampaignData = {
+        ...rest,
+        name: `${initialData.name} (Copy)`,
+        status: "Draft",
+        date: "",
+        time: "",
+      };
+
+      const res = await createCampaign(newCampaignData);
       addToast(
-        "Campaign converted to Draft. You can now edit and reschedule.",
+        "Campaign duplicated as Draft. You can now edit and reschedule.",
         "success",
       );
-      window.location.reload();
+      navigate(`/campaigns/edit/${res.campaign._id}`);
     } catch (err) {
-      addToast("Failed to reschedule campaign", "error");
+      addToast("Failed to duplicate campaign", "error");
     }
   };
 
