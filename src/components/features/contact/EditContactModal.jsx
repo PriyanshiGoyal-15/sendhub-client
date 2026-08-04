@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useContactStore } from "../../../store/ContactStore";
+import { useToast } from "../../../components/UI/toast";
 import { MdClose } from "react-icons/md";
 import { getTagColor } from "../../../utils/getColor";
 
 export default function EditContactModal({ contact, onClose }) {
   const { updateContact, statuses, tags } = useContactStore();
+  const { addToast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -90,6 +92,7 @@ export default function EditContactModal({ contact, onClose }) {
     setError(null);
     try {
       await updateContact(contact._id || contact.id, formData);
+      addToast("Contact updated successfully", "success");
       onClose();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update contact");

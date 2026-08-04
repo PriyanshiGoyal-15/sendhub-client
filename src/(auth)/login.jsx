@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../components/UI/toast";
 import { useNavigate, Link } from "react-router-dom";
 import {
   MdOutlineMailOutline,
@@ -11,6 +12,8 @@ import { FaPaperPlane } from "react-icons/fa";
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { addToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [email, setEmail] = useState(
     () => localStorage.getItem("rememberedEmail") || "",
@@ -23,13 +26,23 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+
     if (rememberMe) {
       localStorage.setItem("rememberedEmail", email);
     } else {
       localStorage.removeItem("rememberedEmail");
     }
-    await login(email, password, rememberMe);
-    navigate("/");
+
+    try {
+      await login(email, password, rememberMe);
+      addToast("Successfully logged in!", "success");
+      navigate("/");
+    } catch (err) {
+      addToast(err.response?.data?.message || "Failed to log in", "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -129,9 +142,10 @@ function Login() {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+                disabled={isLoading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
               >
-                Sign In
+                {isLoading ? "Signing In..." : "Sign In"}
               </button>
             </div>
           </form>

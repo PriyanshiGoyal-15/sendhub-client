@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useSettingStore } from "../../store/SettingStore";
 import { useSearchStore } from "../../store/SearchStore";
 import { useMessageLogStore } from "../../store/MessageLogStore";
+import { useToast } from "../../components/UI/toast";
 import {
   MdOutlineSearch,
   MdOutlineNotifications,
@@ -30,6 +31,7 @@ function Topbar() {
   } = useSearchStore();
   const { recentLogs, fetchRecentLogs, unreadCount, clearUnread } =
     useMessageLogStore();
+  const { addToast } = useToast();
 
   const navigate = useNavigate();
 
@@ -88,6 +90,7 @@ function Topbar() {
 
   const handleLogout = () => {
     logout();
+    addToast("Successfully logged out!", "success");
     navigate("/login");
   };
 
@@ -115,12 +118,13 @@ function Topbar() {
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case "Delivered":
+    if (!status) return <Clock className="text-gray-400" size={16} />;
+    switch (status.toUpperCase()) {
+      case "DELIVERED":
         return <CheckCircle2 className="text-green-500" size={16} />;
-      case "Failed":
+      case "FAILED":
         return <X className="text-red-500" size={16} />;
-      case "Read":
+      case "READ":
         return <CheckCircle2 className="text-blue-500" size={16} />;
       default:
         return <Clock className="text-gray-400" size={16} />;
@@ -308,9 +312,10 @@ function Topbar() {
                       </div>
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full ${
-                          log.status === "Delivered" || log.status === "Read"
+                          log.status?.toUpperCase() === "DELIVERED" ||
+                          log.status?.toUpperCase() === "READ"
                             ? "bg-green-100 text-green-700"
-                            : log.status === "Failed"
+                            : log.status?.toUpperCase() === "FAILED"
                               ? "bg-red-100 text-red-700"
                               : "bg-gray-100 text-gray-700"
                         }`}
@@ -333,7 +338,11 @@ function Topbar() {
             title="Profile"
           >
             {settings?.profileImage ? (
-              <img src={settings.profileImage} alt="Profile" className="h-full w-full object-cover" />
+              <img
+                src={settings.profileImage}
+                alt="Profile"
+                className="h-full w-full object-cover"
+              />
             ) : (
               getInitials(displayName)
             )}

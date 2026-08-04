@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../components/UI/toast";
 import { useNavigate, Link } from "react-router-dom";
 import {
   MdOutlineMailOutline,
@@ -12,6 +13,8 @@ import { FaPaperPlane } from "react-icons/fa";
 function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { addToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,8 +22,16 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await register(name, email, password);
-    navigate("/");
+    setIsLoading(true);
+    try {
+      await register(name, email, password);
+      addToast("Successfully registered!", "success");
+      navigate("/");
+    } catch (err) {
+      addToast(err.response?.data?.message || "Failed to register", "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -111,9 +122,10 @@ function Register() {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+                disabled={isLoading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
               >
-                Register
+                {isLoading ? "Registering..." : "Register"}
               </button>
             </div>
           </form>

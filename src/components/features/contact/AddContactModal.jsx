@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useContactStore } from "../../../store/ContactStore";
+import { useToast } from "../../../components/UI/toast";
 import { MdClose } from "react-icons/md";
 import { getTagColor } from "../../../utils/getColor";
 
 export default function AddContactModal({ onClose }) {
   const { createContact, statuses, tags } = useContactStore();
+  const { addToast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -106,6 +108,7 @@ export default function AddContactModal({ onClose }) {
     setError(null);
     try {
       await createContact(formData);
+      addToast("Contact added successfully", "success");
       onClose();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create contact");
