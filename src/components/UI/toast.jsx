@@ -15,7 +15,7 @@ export const ToastProvider = ({ children }) => {
     // Auto remove after 3 seconds
     setTimeout(() => {
       removeToast(id);
-    }, 3000);
+    }, 30000);
   }, []);
 
   const removeToast = useCallback((id) => {
