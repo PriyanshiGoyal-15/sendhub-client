@@ -4,6 +4,8 @@ import { X } from "lucide-react";
 export default function TemplateModal({ isOpen, onClose, onSave, template }) {
   const [formData, setFormData] = useState({
     name: "",
+    channel: "SMS",
+    subject: "",
     category: "Marketing",
     status: "Approved",
     content: "",
@@ -14,6 +16,8 @@ export default function TemplateModal({ isOpen, onClose, onSave, template }) {
     if (template) {
       setFormData({
         name: template.name,
+        channel: template.channel || "SMS",
+        subject: template.subject || "",
         category: template.category,
         status: template.status,
         content: template.content,
@@ -22,6 +26,8 @@ export default function TemplateModal({ isOpen, onClose, onSave, template }) {
     } else {
       setFormData({
         name: "",
+        channel: "SMS",
+        subject: "",
         category: "Marketing",
         status: "Approved",
         content: "",
@@ -90,6 +96,21 @@ export default function TemplateModal({ isOpen, onClose, onSave, template }) {
             </select>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Channel
+            </label>
+            <select
+              name="channel"
+              value={formData.channel}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            >
+              <option value="SMS">SMS</option>
+              <option value="EMAIL">Email</option>
+            </select>
+          </div>
+
           {isEdit && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -108,6 +129,23 @@ export default function TemplateModal({ isOpen, onClose, onSave, template }) {
             </div>
           )}
 
+          {formData.channel === "EMAIL" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Subject
+              </label>
+              <input
+                type="text"
+                name="subject"
+                required={formData.channel === "EMAIL"}
+                value={formData.subject}
+                onChange={handleChange}
+                placeholder="e.g. Your Order Details"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Content{" "}
@@ -118,10 +156,14 @@ export default function TemplateModal({ isOpen, onClose, onSave, template }) {
             <textarea
               name="content"
               required
-              rows={4}
+              rows={formData.channel === "EMAIL" ? 6 : 4}
               value={formData.content}
               onChange={handleChange}
-              placeholder="Hi {{1}}, your order {{2}} has been confirmed!"
+              placeholder={
+                formData.channel === "EMAIL"
+                  ? "Hi {{1}},\n\nThank you for your order! Your order ID is {{2}}.\n\nBest regards,\nOur Team"
+                  : "Hi {{1}}, your order {{2}} has been confirmed!"
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           </div>

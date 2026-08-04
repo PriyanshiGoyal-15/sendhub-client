@@ -128,7 +128,7 @@ function Topbar() {
   };
 
   return (
-    <div className="sticky top-0 w-full p-3 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-10">
+    <div className="sticky top-0 w-full p-3 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 z-10">
       {/* Left: Search Bar */}
       <div className="flex-1 max-w-lg">
         <div className="relative" ref={searchRef}>
@@ -329,10 +329,14 @@ function Topbar() {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="h-10 w-10 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold flex-shrink-0 hover:ring-2 hover:ring-offset-2 hover:ring-primary transition-all"
+            className="h-10 w-10 rounded-full overflow-hidden bg-yellow-500 flex items-center justify-center text-white font-bold flex-shrink-0 hover:ring-2 hover:ring-offset-2 hover:ring-primary transition-all"
             title="Profile"
           >
-            {getInitials(displayName)}
+            {settings?.profileImage ? (
+              <img src={settings.profileImage} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              getInitials(displayName)
+            )}
           </button>
 
           {/* Dropdown Menu */}

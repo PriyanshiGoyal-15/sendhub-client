@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCampaignStore } from "../../../../store/CampaignStore";
 import CreateCampaignLayout from "../../../../components/features/campaign/create/00_CreateCampaignLayout";
+import CampaignDetailsPage from "../../../../components/features/campaign/CampaignDetailsPage";
 import { useToast } from "../../../../components/UI/toast";
 
 export default function EditCampaignPage() {
@@ -40,11 +41,17 @@ export default function EditCampaignPage() {
         setInitialData({
           name: campaign.name,
           type: "Marketing Message",
-          template: campaign.template || null,
+          channels: campaign.channels || ["SMS"],
+          templates: campaign.templates || { SMS: null, EMAIL: null },
           audienceTags: campaign.audienceTags || [],
           variables: campaign.variables || {},
           date: date,
           time: time,
+          status: campaign.status,
+          audience: campaign.audience,
+          sent: campaign.sent,
+          failed: campaign.failed,
+          failureReason: campaign.failureReason,
         });
       } catch (error) {
         if (!isMounted) return;
@@ -68,6 +75,12 @@ export default function EditCampaignPage() {
         <p className="text-gray-500">Loading campaign...</p>
       </div>
     );
+  }
+
+  // Route based on campaign status
+  if (initialData?.status && initialData.status !== "Draft") {
+    // Return detailed view for anything that's not a draft
+    return <CampaignDetailsPage campaignId={id} initialData={initialData} />;
   }
 
   return (

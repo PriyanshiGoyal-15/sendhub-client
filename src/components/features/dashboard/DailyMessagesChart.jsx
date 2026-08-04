@@ -36,7 +36,6 @@ export default function DailyMessagesChart() {
         name: formattedDate,
         sent: found ? found.sent : 0,
         delivered: found ? found.delivered : 0,
-        read: found ? found.read : 0,
       });
     }
 
@@ -105,15 +104,6 @@ export default function DailyMessagesChart() {
               stroke="#eab308"
               strokeWidth={2}
               dot={{ r: 3, fill: "#eab308", strokeWidth: 0 }}
-              activeDot={{ r: 5 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="read"
-              name="read"
-              stroke="#9ca3af"
-              strokeWidth={2}
-              dot={{ r: 3, fill: "#9ca3af", strokeWidth: 0 }}
               activeDot={{ r: 5 }}
             />
           </LineChart>

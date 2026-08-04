@@ -192,10 +192,15 @@ export default function ScheduleSend({
             <p className="font-medium text-gray-900">{data.name || "—"}</p>
           </div>
           <div>
-            <p className="text-gray-500 mb-1">Template</p>
-            <p className="font-medium text-gray-900">
-              {data.template?.name || "—"}
-            </p>
+            <p className="text-gray-500 mb-1">Templates</p>
+            <div className="font-medium text-gray-900">
+              {(data.channels || []).map((ch) => (
+                <div key={ch}>
+                  <span className="text-xs text-gray-500 mr-2">{ch}:</span>
+                  {data.templates?.[ch]?.name || "—"}
+                </div>
+              ))}
+            </div>
           </div>
           <div>
             <p className="text-gray-500 mb-1">Audience Tags</p>

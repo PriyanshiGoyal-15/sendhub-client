@@ -25,8 +25,9 @@ export default function CreateCampaignLayout({
   const [formData, setFormData] = useState(
     initialData || {
       name: "",
-      type: "]",
-      template: null,
+      type: "Marketing Message",
+      channels: ["SMS"],
+      templates: { SMS: null, EMAIL: null },
       audienceTags: [],
       variables: {},
       date: "",

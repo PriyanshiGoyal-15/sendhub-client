@@ -6,7 +6,15 @@ export const useCampaignStore = create(
   persist(
     (set, get) => ({
       campaigns: [],
-      filters: ["All", "Running", "Scheduled", "Draft", "Completed", "Failed"],
+      filters: [
+        "All",
+        "Running",
+        "Scheduled",
+        "Draft",
+        "Completed",
+        "Failed",
+        "Partially Failed",
+      ],
       loading: false,
       error: null,
 

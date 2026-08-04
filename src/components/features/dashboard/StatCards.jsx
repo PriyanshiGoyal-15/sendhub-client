@@ -3,9 +3,9 @@ import {
   BookOpen,
   Send,
   CheckCircle2,
-  Eye,
   AlertCircle,
   Megaphone,
+  Percent,
 } from "lucide-react";
 import { useDashboardStore } from "../../../store/DashboardStore";
 
@@ -33,23 +33,15 @@ export default function StatCards() {
       bgColor: "bg-green-50",
     },
     {
-      title: "Delivered",
-      value: cards.delivered || 0,
+      title: "Completed Campaigns",
+      value: cards.completedCampaigns || 0,
       trend: "",
       isPositive: true,
       icon: CheckCircle2,
       iconColor: "text-green-600",
       bgColor: "bg-green-50",
     },
-    {
-      title: "Read",
-      value: cards.read || 0,
-      trend: "",
-      isPositive: true,
-      icon: Eye,
-      iconColor: "text-green-600",
-      bgColor: "bg-green-50",
-    },
+
     {
       title: "Failed",
       value: cards.failed || 0,
@@ -68,10 +60,28 @@ export default function StatCards() {
       iconColor: "text-green-600",
       bgColor: "bg-green-50",
     },
+    {
+      title: "Delivery Rate",
+      value: `${dashboardData?.quickStats?.deliveryRate || 0}%`,
+      trend: "",
+      isPositive: true,
+      icon: Percent,
+      iconColor: "text-blue-600",
+      bgColor: "bg-blue-50",
+    },
+    {
+      title: "Failure Rate",
+      value: `${dashboardData?.quickStats?.failureRate || 0}%`,
+      trend: "",
+      isPositive: false,
+      icon: AlertCircle,
+      iconColor: "text-red-600",
+      bgColor: "bg-red-50",
+    },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-6">
       {stats.map((stat, index) => (
         <div
           key={index}

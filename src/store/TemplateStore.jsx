@@ -69,11 +69,12 @@ export const useTemplateStore = create(
           await get().fetchTemplates();
           return res.data;
         } catch (err) {
+          const errorMessage = err.response?.data?.message || "Failed to create template";
           set({
-            error: err.response?.data?.message || "Failed to create template",
+            error: errorMessage,
             loading: false,
           });
-          throw err;
+          throw new Error(errorMessage);
         }
       },
 
@@ -84,11 +85,12 @@ export const useTemplateStore = create(
           await get().fetchTemplates();
           return res.data;
         } catch (err) {
+          const errorMessage = err.response?.data?.message || "Failed to update template";
           set({
-            error: err.response?.data?.message || "Failed to update template",
+            error: errorMessage,
             loading: false,
           });
-          throw err;
+          throw new Error(errorMessage);
         }
       },
 
@@ -98,11 +100,12 @@ export const useTemplateStore = create(
           await api.delete(`/templates/${id}`);
           await get().fetchTemplates();
         } catch (err) {
+          const errorMessage = err.response?.data?.message || "Failed to delete template";
           set({
-            error: err.response?.data?.message || "Failed to delete template",
+            error: errorMessage,
             loading: false,
           });
-          throw err;
+          throw new Error(errorMessage);
         }
       },
 

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import ProfileTab from "../../components/features/settings/ProfileTab";
-import WhatsAppApiTab from "../../components/features/settings/WhatsAppApiTab";
-import SendingLimitsTab from "../../components/features/settings/SendingLimitsTab";
+import ProviderApiTab from "../../components/features/settings/ProviderApiTab";
+// import SendingLimitsTab from "../../components/features/settings/SendingLimitsTab";
 import { useSettingStore } from "../../store/SettingStore";
 
 export default function Settings() {
@@ -31,11 +31,11 @@ export default function Settings() {
           {/* Sender Identity Card */}
           <ProfileTab />
 
-          {/* WhatsApp API Configuration Card */}
-          <WhatsAppApiTab />
+          {/* Provider API Configuration Card */}
+          <ProviderApiTab />
 
           {/* Sending Limits */}
-          <SendingLimitsTab />
+          {/* <SendingLimitsTab /> */}
         </div>
       </div>
     </div>

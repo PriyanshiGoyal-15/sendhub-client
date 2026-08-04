@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useSettingStore } from "../../store/SettingStore";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaPaperPlane } from "react-icons/fa";
 import {
   MdOutlineDashboard,
   MdOutlineContacts,
@@ -19,7 +19,7 @@ const navItems = [
   { name: "Contacts", path: "/contacts", icon: MdOutlineContacts },
   { name: "Campaigns", path: "/campaigns", icon: MdOutlineCampaign },
   { name: "Templates", path: "/templates", icon: MdOutlineDescription },
-  { name: "Inbox", path: "/inbox", icon: MdOutlineChat },
+  // { name: "Inbox", path: "/inbox", icon: MdOutlineChat },
   // { name: "Analytics", path: "/analytics", icon: MdOutlineAnalytics },
   { name: "Settings", path: "/settings", icon: MdOutlineSettings },
 ];
@@ -29,6 +29,7 @@ function Sidebar() {
   const { settings, fetchSettings } = useSettingStore();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
     if (!settings) {
@@ -50,16 +51,45 @@ function Sidebar() {
   };
 
   return (
-    <div
-      className={`${isCollapsed ? "w-[80px]" : "w-[240px]"} transition-all duration-300 flex-shrink-0 bg-gray-50 border-r border-gray-200 flex flex-col justify-between h-full relative`}
-    >
-      {/* Collapse Toggle */}
+    <>
+      {/* Mobile Toggle Button (Visible only on small screens) */}
       <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-6 bg-white border border-gray-200 rounded-full p-1 text-gray-500 hover:text-gray-900 hover:bg-gray-50 z-50 shadow-sm transition-colors"
+        onClick={() => setIsMobileOpen(true)}
+        className="md:hidden fixed bottom-6 right-6 z-[60] bg-green-500 text-white p-3 rounded-full shadow-lg"
       >
-        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        <Menu size={24} />
       </button>
+
+      {/* Overlay for mobile */}
+      {isMobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      <div
+        className={`fixed md:relative z-50 ${
+          isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        } ${
+          isCollapsed ? "md:w-[80px]" : "md:w-[240px]"
+        } w-[240px] transition-all duration-300 flex-shrink-0 bg-gray-50 border-r border-gray-200 flex flex-col justify-between h-full`}
+      >
+        {/* Mobile Close Button */}
+        <button
+          onClick={() => setIsMobileOpen(false)}
+          className="md:hidden absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-900 bg-gray-100 rounded-full"
+        >
+          <X size={16} />
+        </button>
+
+        {/* Collapse Toggle (Desktop only) */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="hidden md:block absolute -right-3 top-6 bg-white border border-gray-200 rounded-full p-1 text-gray-500 hover:text-gray-900 hover:bg-gray-50 z-50 shadow-sm transition-colors"
+        >
+          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
 
       <div>
         {/* Top Logo Area */}
@@ -69,12 +99,12 @@ function Sidebar() {
           <div
             className={`bg-primary rounded-lg p-1.5 flex items-center justify-center flex-shrink-0 ${isCollapsed ? "mr-0" : "mr-3"}`}
           >
-            <FaWhatsapp className="text-white text-xl" />
+            <FaPaperPlane className="text-white text-xl" />
           </div>
           <span
             className={`text-gray-900 font-bold text-lg whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? "opacity-0 w-0 hidden" : "opacity-100"}`}
           >
-            WABA Platform
+            SendHub
           </span>
         </div>
 
@@ -116,9 +146,13 @@ function Sidebar() {
           className={`flex items-center ${isCollapsed ? "justify-center" : ""}`}
         >
           <div
-            className={`h-10 w-10 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold flex-shrink-0 ${isCollapsed ? "mr-0" : "mr-3"}`}
+            className={`h-10 w-10 rounded-full overflow-hidden bg-yellow-500 flex items-center justify-center text-white font-bold flex-shrink-0 ${isCollapsed ? "mr-0" : "mr-3"}`}
           >
-            {getInitials(displayName)}
+            {settings?.profileImage ? (
+              <img src={settings.profileImage} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              getInitials(displayName)
+            )}
           </div>
           <div
             className={`overflow-hidden transition-all duration-300 ${isCollapsed ? "opacity-0 w-0 hidden" : "opacity-100"}`}
@@ -131,6 +165,7 @@ function Sidebar() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

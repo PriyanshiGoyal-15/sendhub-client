@@ -72,16 +72,19 @@ export default function TemplateCard({
       </div>
 
       <div className="flex space-x-2 mb-3">
+        <span className="px-2 py-0.5 text-xs font-medium rounded bg-purple-100 text-purple-700">
+          {template.channel || "SMS"}
+        </span>
         <span
           className={`px-2 py-0.5 text-xs font-medium rounded ${getCategoryColor(
-            template.category
+            template.category,
           )}`}
         >
           {template.category}
         </span>
         <span
           className={`px-2 py-0.5 text-xs font-medium rounded ${getStatusColor(
-            template.status || "Approved"
+            template.status || "Approved",
           )}`}
         >
           {template.status || "Approved"}
@@ -94,7 +97,10 @@ export default function TemplateCard({
 
       <div className="flex items-center text-xs text-gray-500 space-x-3">
         <span>{template.language || "English"}</span>
-        <span>Modified {formatDate(template.updatedAt || template.createdAt || new Date())}</span>
+        <span>
+          Modified{" "}
+          {formatDate(template.updatedAt || template.createdAt || new Date())}
+        </span>
         <span>
           {template.variableCount || 0}{" "}
           {template.variableCount === 1 ? "variable" : "variables"}

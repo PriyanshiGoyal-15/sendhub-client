@@ -9,6 +9,10 @@ export default function CampaignDetails({ data, updateData, onNext }) {
       addToast("Please enter a campaign name.", "error");
       return;
     }
+    if (!data.channels || data.channels.length === 0) {
+      addToast("Please select at least one channel.", "error");
+      return;
+    }
     onNext();
   };
   return (
@@ -41,6 +45,40 @@ export default function CampaignDetails({ data, updateData, onNext }) {
           <option value="Utility Notification">Utility Notification</option>
           <option value="Authentication">Authentication</option>
         </select>
+      </div>
+
+      <div className="mb-8">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Channels (Select at least one)
+        </label>
+        <div className="flex gap-4">
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={data.channels?.includes("SMS") || false}
+              onChange={(e) => {
+                const current = data.channels || [];
+                if (e.target.checked) updateData({ channels: [...current, "SMS"] });
+                else updateData({ channels: current.filter((c) => c !== "SMS") });
+              }}
+              className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+            />
+            <span className="text-gray-700">SMS</span>
+          </label>
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={data.channels?.includes("EMAIL") || false}
+              onChange={(e) => {
+                const current = data.channels || [];
+                if (e.target.checked) updateData({ channels: [...current, "EMAIL"] });
+                else updateData({ channels: current.filter((c) => c !== "EMAIL") });
+              }}
+              className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+            />
+            <span className="text-gray-700">Email</span>
+          </label>
+        </div>
       </div>
 
       <div className="flex justify-end">

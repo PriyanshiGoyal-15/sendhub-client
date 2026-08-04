@@ -6,19 +6,29 @@ import {
   MdOutlineRemoveRedEye,
   MdOutlineVisibilityOff,
 } from "react-icons/md";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaPaperPlane } from "react-icons/fa";
 
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(
+    () => localStorage.getItem("rememberedEmail") || "",
+  );
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(
+    () => !!localStorage.getItem("rememberedEmail"),
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
+    if (rememberMe) {
+      localStorage.setItem("rememberedEmail", email);
+    } else {
+      localStorage.removeItem("rememberedEmail");
+    }
+    await login(email, password, rememberMe);
     navigate("/");
   };
 
@@ -27,9 +37,9 @@ function Login() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center">
         <div className="flex items-center space-x-2 text-2xl font-bold mb-8">
           <div className="bg-primary rounded-lg p-1.5 flex items-center justify-center">
-            <FaWhatsapp className="text-white text-xl" />
+            <FaPaperPlane className="text-white text-xl" />
           </div>
-          <span>WABA Platform</span>
+          <span>SendHub</span>
         </div>
       </div>
 
@@ -94,6 +104,8 @@ function Login() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded cursor-pointer"
                 />
                 <label

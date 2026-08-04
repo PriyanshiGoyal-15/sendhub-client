@@ -7,7 +7,7 @@ import {
   MdOutlinePersonOutline,
   MdOutlineVisibilityOff,
 } from "react-icons/md";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaPaperPlane } from "react-icons/fa";
 
 function Register() {
   const { register } = useAuth();
@@ -28,9 +28,9 @@ function Register() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center">
         <div className="flex items-center space-x-2 text-2xl font-bold mb-8">
           <div className="bg-primary rounded-lg p-1.5 flex items-center justify-center">
-            <FaWhatsapp className="text-white text-xl" />
+            <FaPaperPlane className="text-white text-xl" />
           </div>
-          <span>WABA Platform</span>
+          <span>SendHub</span>
         </div>
       </div>
 
