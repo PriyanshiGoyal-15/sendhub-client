@@ -112,8 +112,8 @@ export default function ProviderApiTab() {
           }`}
         >
           {/* Header */}
-          <div className="p-4 flex items-center justify-between bg-gray-50 rounded-t-lg">
-            <div className="flex items-center gap-4">
+          <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 rounded-t-lg gap-4 sm:gap-0">
+            <div className="flex items-start sm:items-center gap-4">
               <div
                 className={`p-2 rounded-full ${
                   isTwilioConnected
@@ -135,7 +135,7 @@ export default function ProviderApiTab() {
             {openPanel !== "twilio" && (
               <button
                 onClick={() => setOpenPanel("twilio")}
-                className="px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full sm:w-auto text-center"
               >
                 {isTwilioConnected ? "Manage" : "Reconnect"}
               </button>
@@ -227,8 +227,8 @@ export default function ProviderApiTab() {
           }`}
         >
           {/* Header */}
-          <div className="p-4 flex items-center justify-between bg-gray-50 rounded-t-lg">
-            <div className="flex items-center gap-4">
+          <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 rounded-t-lg gap-4 sm:gap-0">
+            <div className="flex items-start sm:items-center gap-4">
               <div
                 className={`p-2 rounded-full ${
                   isSendgridConnected
@@ -250,7 +250,7 @@ export default function ProviderApiTab() {
             {openPanel !== "sendgrid" && (
               <button
                 onClick={() => setOpenPanel("sendgrid")}
-                className="px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full sm:w-auto text-center"
               >
                 {isSendgridConnected ? "Manage" : "Reconnect"}
               </button>

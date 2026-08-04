@@ -18,9 +18,10 @@ import {
   AlertCircle,
   Clock,
   X,
+  Menu,
 } from "lucide-react";
 
-function Topbar() {
+function Topbar({ onMenuClick }) {
   const { user, logout } = useAuth();
   const { settings, fetchSettings } = useSettingStore();
   const {
@@ -132,7 +133,15 @@ function Topbar() {
   };
 
   return (
-    <div className="sticky top-0 w-full p-3 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 z-10">
+    <div className="sticky top-0 w-full p-3 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 z-10 gap-3">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={onMenuClick}
+        className="md:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-md hover:bg-gray-100"
+      >
+        <Menu size={24} />
+      </button>
+
       {/* Left: Search Bar */}
       <div className="flex-1 max-w-lg">
         <div className="relative" ref={searchRef}>

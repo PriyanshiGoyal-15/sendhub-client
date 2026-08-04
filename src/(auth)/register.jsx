@@ -19,16 +19,20 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
     try {
       await register(name, email, password);
       addToast("Successfully registered!", "success");
       navigate("/");
     } catch (err) {
-      addToast(err.response?.data?.message || "Failed to register", "error");
+      const errMsg = err.response?.data?.error?.message || "Failed to register";
+      setError(errMsg);
+      addToast(errMsg, "error");
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +132,11 @@ function Register() {
                 {isLoading ? "Registering..." : "Register"}
               </button>
             </div>
+            {error && (
+              <div className="text-red-600 text-sm text-center font-medium bg-red-50 p-2.5 rounded-lg">
+                {error}
+              </div>
+            )}
           </form>
 
           <div className="mt-8 pt-6 border-t border-gray-50 text-center">

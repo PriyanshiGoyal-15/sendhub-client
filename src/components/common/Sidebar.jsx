@@ -24,12 +24,11 @@ const navItems = [
   { name: "Settings", path: "/settings", icon: MdOutlineSettings },
 ];
 
-function Sidebar() {
+function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const { user } = useAuth();
   const { settings, fetchSettings } = useSettingStore();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
     if (!settings) {
@@ -52,14 +51,6 @@ function Sidebar() {
 
   return (
     <>
-      {/* Mobile Toggle Button (Visible only on small screens) */}
-      <button
-        onClick={() => setIsMobileOpen(true)}
-        className="md:hidden fixed bottom-6 right-6 z-[60] bg-green-500 text-white p-3 rounded-full shadow-lg"
-      >
-        <Menu size={24} />
-      </button>
-
       {/* Overlay for mobile */}
       {isMobileOpen && (
         <div
@@ -91,80 +82,84 @@ function Sidebar() {
           {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
 
-      <div>
-        {/* Top Logo Area */}
-        <div
-          className={`flex items-center py-4 border-b border-gray-200 ${isCollapsed ? "px-4 justify-center" : "px-4"}`}
-        >
+        <div>
+          {/* Top Logo Area */}
           <div
-            className={`bg-primary rounded-lg p-1.5 flex items-center justify-center flex-shrink-0 ${isCollapsed ? "mr-0" : "mr-3"}`}
+            className={`flex items-center py-4 border-b border-gray-200 ${isCollapsed ? "px-4 justify-center" : "px-4"}`}
           >
-            <FaPaperPlane className="text-white text-xl" />
+            <div
+              className={`bg-primary rounded-lg p-1.5 flex items-center justify-center flex-shrink-0 ${isCollapsed ? "mr-0" : "mr-3"}`}
+            >
+              <FaPaperPlane className="text-white text-xl" />
+            </div>
+            <span
+              className={`text-gray-900 font-bold text-lg whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? "opacity-0 w-0 hidden" : "opacity-100"}`}
+            >
+              SendHub
+            </span>
           </div>
-          <span
-            className={`text-gray-900 font-bold text-lg whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? "opacity-0 w-0 hidden" : "opacity-100"}`}
-          >
-            SendHub
-          </span>
-        </div>
 
-        {/* Navigation Links */}
-        <div className="px-4 py-6 space-y-1">
-          {navItems.map((item) => {
-            const isActive =
-              location.pathname === item.path ||
-              (item.path !== "/" && location.pathname.startsWith(item.path));
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`flex items-center py-3 text-sm font-medium rounded-lg transition-colors ${
-                  isActive
-                    ? "bg-green-200/50 text-green-800"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                } ${isCollapsed ? "px-0 justify-center" : "px-4"}`}
-              >
-                <item.icon
-                  className={`text-xl ${isActive ? "text-green-700" : "text-gray-500"} ${isCollapsed ? "mr-0" : "mr-3"} flex-shrink-0`}
-                />
-                <span
-                  className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? "opacity-0 w-0 hidden" : "opacity-100"}`}
+          {/* Navigation Links */}
+          <div className="px-4 py-6 space-y-1">
+            {navItems.map((item) => {
+              const isActive =
+                location.pathname === item.path ||
+                (item.path !== "/" && location.pathname.startsWith(item.path));
+              return (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className={`flex items-center py-3 text-sm font-medium rounded-lg transition-colors ${
+                    isActive
+                      ? "bg-green-200/50 text-green-800"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  } ${isCollapsed ? "px-0 justify-center" : "px-4"}`}
                 >
-                  {item.name}
-                </span>
-              </Link>
-            );
-          })}
+                  <item.icon
+                    className={`text-xl ${isActive ? "text-green-700" : "text-gray-500"} ${isCollapsed ? "mr-0" : "mr-3"} flex-shrink-0`}
+                  />
+                  <span
+                    className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? "opacity-0 w-0 hidden" : "opacity-100"}`}
+                  >
+                    {item.name}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* Bottom Profile Area */}
-      <div
-        className={`border-t border-gray-200 p-4 flex ${isCollapsed ? "justify-center" : ""}`}
-      >
+        {/* Bottom Profile Area */}
         <div
-          className={`flex items-center ${isCollapsed ? "justify-center" : ""}`}
+          className={`border-t border-gray-200 p-4 flex ${isCollapsed ? "justify-center" : ""}`}
         >
           <div
-            className={`h-10 w-10 rounded-full overflow-hidden bg-yellow-500 flex items-center justify-center text-white font-bold flex-shrink-0 ${isCollapsed ? "mr-0" : "mr-3"}`}
+            className={`flex items-center ${isCollapsed ? "justify-center" : ""}`}
           >
-            {settings?.profileImage ? (
-              <img src={settings.profileImage} alt="Profile" className="h-full w-full object-cover" />
-            ) : (
-              getInitials(displayName)
-            )}
-          </div>
-          <div
-            className={`overflow-hidden transition-all duration-300 ${isCollapsed ? "opacity-0 w-0 hidden" : "opacity-100"}`}
-          >
-            <p className="text-sm font-medium text-gray-900 truncate">
-              {displayName}
-            </p>
-            <p className="text-xs text-gray-500 truncate">Admin</p>
+            <div
+              className={`h-10 w-10 rounded-full overflow-hidden bg-yellow-500 flex items-center justify-center text-white font-bold flex-shrink-0 ${isCollapsed ? "mr-0" : "mr-3"}`}
+            >
+              {settings?.profileImage ? (
+                <img
+                  src={settings.profileImage}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                getInitials(displayName)
+              )}
+            </div>
+            <div
+              className={`overflow-hidden transition-all duration-300 ${isCollapsed ? "opacity-0 w-0 hidden" : "opacity-100"}`}
+            >
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {displayName}
+              </p>
+              <p className="text-xs text-gray-500 truncate">Admin</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

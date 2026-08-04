@@ -39,7 +39,10 @@ function Login() {
       addToast("Successfully logged in!", "success");
       navigate("/");
     } catch (err) {
-      addToast(err.response?.data?.message || "Failed to log in", "error");
+      addToast(
+        err.response?.data?.error?.message || "Failed to log in",
+        "error",
+      );
     } finally {
       setIsLoading(false);
     }
