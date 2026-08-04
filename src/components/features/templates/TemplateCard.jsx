@@ -1,4 +1,6 @@
+import React, { useState } from "react";
 import { Edit2, Trash2 } from "lucide-react";
+import ConfirmModal from "../../UI/ConfirmModal";
 
 export default function TemplateCard({
   template,
@@ -7,6 +9,8 @@ export default function TemplateCard({
   onEdit,
   onDelete,
 }) {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toISOString().split("T")[0]; // returns YYYY-MM-DD
@@ -62,7 +66,7 @@ export default function TemplateCard({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(template);
+              setIsDeleteModalOpen(true);
             }}
             className="hover:text-red-500 transition-colors"
           >
@@ -106,6 +110,17 @@ export default function TemplateCard({
           {template.variableCount === 1 ? "variable" : "variables"}
         </span>
       </div>
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => onDelete(template)}
+        title="Delete Template"
+        message={`Are you sure you want to delete "${template.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDestructive={true}
+      />
     </div>
   );
 }

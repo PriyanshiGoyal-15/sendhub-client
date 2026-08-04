@@ -130,28 +130,29 @@ export default function TemplateAudience({
 
         {/* Dynamic Variable Inputs */}
         {(() => {
-          let allUniqueVars = [];
-          const varNames = {};
+          let totalVars = 0;
+          const channelVars = {};
 
           selectedChannels.forEach((channel) => {
             const tpl = data.templates?.[channel];
             if (tpl) {
               const extractedMatches = tpl.content?.match(/\{\{\d+\}\}/g) || [];
               const uniqueVars = [...new Set(extractedMatches)].sort();
-              uniqueVars.forEach((v) => {
-                const varNumber = v.replace(/[{}]/g, "");
-                if (!allUniqueVars.includes(v)) allUniqueVars.push(v);
-                if (!varNames[varNumber]) {
-                  varNames[varNumber] =
-                    tpl.variables && tpl.variables[varNumber - 1]
+              
+              if (uniqueVars.length > 0) {
+                channelVars[channel] = uniqueVars.map((v) => {
+                  const varNumber = v.replace(/[{}]/g, "");
+                  const varName = tpl.variables && tpl.variables[varNumber - 1]
                       ? tpl.variables[varNumber - 1]
                       : `Variable ${varNumber}`;
-                }
-              });
+                  totalVars++;
+                  return { varNumber, varName, original: v };
+                });
+              }
             }
           });
 
-          if (allUniqueVars.length === 0) return null;
+          if (totalVars === 0) return null;
 
           return (
             <div className="mt-6 border-t pt-6">
@@ -159,37 +160,35 @@ export default function TemplateAudience({
                 Template Variables
               </h3>
               <p className="text-sm text-gray-500 mb-4">
-                Fill in the values for this campaign's variables.
+                Fill in the values for this campaign's variables by channel.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {allUniqueVars.map((v) => {
-                  const varNumber = v.replace(/[{}]/g, "");
-                  const varName = varNames[varNumber];
-
-                  return (
-                    <div key={v} className="flex flex-col">
-                      <label className="text-sm font-medium text-gray-700 mb-1">{`{{${varNumber}}} - ${varName}`}</label>
-                      <input
-                        type="text"
-                        placeholder={`Enter value for ${varName}`}
-                        value={
-                          data.variables
-                            ? data.variables[String(varNumber)] ||
-                              data.variables[varNumber] ||
-                              ""
-                            : ""
-                        }
-                        onChange={(e) => {
-                          const newVars = { ...(data.variables || {}) };
-                          newVars[String(varNumber)] = e.target.value;
-                          updateData({ variables: newVars });
-                        }}
-                        className="p-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none text-sm"
-                      />
-                    </div>
-                  );
-                })}
-              </div>
+              
+              {Object.keys(channelVars).map(channel => (
+                <div key={channel} className="mb-6">
+                  <h4 className="text-sm font-bold text-gray-800 mb-3">{channel} Variables</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {channelVars[channel].map(({varNumber, varName, original}) => (
+                      <div key={original} className="flex flex-col">
+                        <label className="text-sm font-medium text-gray-700 mb-1">{`{{${varNumber}}} - ${varName}`}</label>
+                        <input
+                          type="text"
+                          placeholder={`Enter value for ${varName}`}
+                          value={
+                            data.variables?.[channel]?.[String(varNumber)] || ""
+                          }
+                          onChange={(e) => {
+                            const newVars = { ...(data.variables || {}) };
+                            if (!newVars[channel]) newVars[channel] = {};
+                            newVars[channel] = { ...newVars[channel], [String(varNumber)]: e.target.value };
+                            updateData({ variables: newVars });
+                          }}
+                          className="p-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           );
         })()}

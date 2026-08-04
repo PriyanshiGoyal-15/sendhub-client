@@ -13,12 +13,14 @@ import {
 } from "lucide-react";
 import { useToast } from "../../../components/UI/toast";
 import { useCampaignStore } from "../../../store/CampaignStore";
+import ConfirmModal from "../../../components/UI/ConfirmModal";
 
 export default function CampaignCard({ campaign }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const { deleteCampaign } = useCampaignStore();
   const [showMenu, setShowMenu] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
   const menuRef = useRef(null);
 
@@ -222,7 +224,7 @@ export default function CampaignCard({ campaign }) {
               <button
                 onClick={() => {
                   setShowMenu(false);
-                  handleDelete();
+                  setIsDeleteModalOpen(true);
                 }}
                 className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors"
               >
@@ -313,6 +315,17 @@ export default function CampaignCard({ campaign }) {
           </p>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Campaign"
+        message={`Are you sure you want to delete "${campaign.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDestructive={true}
+      />
     </div>
   );
 }
