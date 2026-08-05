@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import CampaignCard from "./CampaignCard";
+import CampaignCard, { CampaignCardSkeleton } from "./CampaignCard";
 import { useCampaignStore } from "../../../store/CampaignStore";
 
 export default function CampaignList() {
@@ -20,8 +20,10 @@ export default function CampaignList() {
 
   if (loading && campaigns.length === 0) {
     return (
-      <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <CampaignCardSkeleton key={i} />
+        ))}
       </div>
     );
   }

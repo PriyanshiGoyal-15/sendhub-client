@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { useToast } from "../../UI/toast";
@@ -8,6 +8,7 @@ export default function ProfileTab() {
   const { user } = useAuth();
   const { settings, saveSettings } = useSettingStore();
   const { addToast } = useToast();
+  const fileInputRef = React.useRef(null);
 
   const [formData, setFormData] = useState({
     senderName: settings?.senderName || user?.name || "",
@@ -103,16 +104,47 @@ export default function ProfileTab() {
               )}
             </div>
             <div>
-              <label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                <span>Upload a file</span>
-                <input
-                  type="file"
-                  name="profileImage"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={handleImageChange}
-                />
-              </label>
+              <div className="flex items-center gap-3">
+                <label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                  <span>Upload a file</span>
+                  <input
+                    type="file"
+                    name="profileImage"
+                    accept="image/*"
+                    className="sr-only"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                  />
+                </label>
+                {formData.profileImage && (
+                  <button
+                    type="button"
+                    disabled={isSaving}
+                    onClick={async () => {
+                      const updatedForm = { ...formData, profileImage: "" };
+                      setFormData(updatedForm);
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                      }
+
+                      // Auto-save the removal
+                      setIsSaving(true);
+                      const result = await saveSettings(updatedForm);
+                      setIsSaving(false);
+                      if (result.success) {
+                        addToast("Profile photo removed", "success");
+                      } else {
+                        addToast("Failed to remove photo", "error");
+                      }
+                    }}
+                    className="py-2 px-3 border border-red-200 rounded-md shadow-sm text-sm font-medium text-red-600 hover:bg-red-50 transition-colors bg-white disabled:opacity-50"
+                  >
+                    {isSaving && !formData.profileImage
+                      ? "Removing..."
+                      : "Remove"}
+                  </button>
+                )}
+              </div>
               <p className="mt-3 text-xs text-gray-500">
                 JPG, PNG, GIF between 100KB and 4MB
               </p>

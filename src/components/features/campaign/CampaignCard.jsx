@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  MoreVertical,
   Edit2,
   Trash2,
   Eye,
@@ -10,6 +9,7 @@ import {
   XCircle,
   AlertCircle,
   Calendar,
+  CalendarClock,
 } from "lucide-react";
 import { useToast } from "../../../components/UI/toast";
 import { useCampaignStore } from "../../../store/CampaignStore";
@@ -18,19 +18,23 @@ import ConfirmModal from "../../../components/UI/ConfirmModal";
 export default function CampaignCard({ campaign }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const { deleteCampaign } = useCampaignStore();
-  const [showMenu, setShowMenu] = useState(false);
+  const { deleteCampaign, createCampaign } = useCampaignStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
-  const menuRef = useRef(null);
 
   const getStatusBadge = (status) => {
     switch (status) {
       case "Running":
         return (
-          <span className="px-2.5 py-1 bg-green-50 text-green-700 border border-green-200 text-[11px] font-bold tracking-wide uppercase rounded-md shadow-sm">
-            Running
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 bg-green-50 text-green-700 border border-green-200 text-[11px] font-bold tracking-wide uppercase rounded-md shadow-sm">
+              Running
+            </span>
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+            </span>
+          </div>
         );
       case "Scheduled":
         return (
@@ -100,15 +104,40 @@ export default function CampaignCard({ campaign }) {
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const handleReschedule = async () => {
+    try {
+      const {
+        _id,
+        id,
+        createdAt,
+        updatedAt,
+        __v,
+        sent,
+        failed,
+        audience,
+        startDate,
+        failureReason,
+        ...rest
+      } = campaign;
+
+      const newCampaignData = {
+        ...rest,
+        name: `${campaign.name} (Copy)`,
+        status: "Draft",
+        date: "",
+        time: "",
+      };
+
+      const res = await createCampaign(newCampaignData);
+      addToast(
+        "Campaign duplicated as Draft. You can now edit and reschedule.",
+        "success",
+      );
+      navigate(`/campaigns/edit/${res.campaign._id}`);
+    } catch (err) {
+      addToast("Failed to reschedule campaign", "error");
+    }
+  };
 
   useEffect(() => {
     if (campaign.status !== "Scheduled" || !campaign.startDate) return;
@@ -192,46 +221,41 @@ export default function CampaignCard({ campaign }) {
           </div>
         </div>
 
-        {/* Action Menu */}
-        <div className="relative ml-4" ref={menuRef}>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 ml-4">
           <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="text-gray-400 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors focus:outline-none"
+            onClick={() => navigate(`/campaigns/edit/${campaign._id}`)}
+            className="group/btn relative hover:z-50 text-gray-400 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 p-2 rounded-full transition-colors focus:outline-none"
           >
-            <MoreVertical size={18} />
+            {campaign.status === "Draft" ? (
+              <Edit2 size={16} />
+            ) : (
+              <Eye size={16} />
+            )}
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[11px] rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-sm">
+              {campaign.status === "Draft" ? "Edit Campaign" : "View Details"}
+            </span>
           </button>
 
-          {showMenu && (
-            <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-20 overflow-hidden transform opacity-100 scale-100 transition-all origin-top-right">
-              <button
-                onClick={() => {
-                  setShowMenu(false);
-                  navigate(`/campaigns/edit/${campaign._id}`);
-                }}
-                className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2.5 transition-colors"
-              >
-                {campaign.status === "Draft" ? (
-                  <>
-                    <Edit2 size={16} /> Edit Campaign
-                  </>
-                ) : (
-                  <>
-                    <Eye size={16} /> View Details
-                  </>
-                )}
-              </button>
-              <div className="h-px bg-gray-100 my-1 mx-2"></div>
-              <button
-                onClick={() => {
-                  setShowMenu(false);
-                  setIsDeleteModalOpen(true);
-                }}
-                className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors"
-              >
-                <Trash2 size={16} /> Delete Campaign
-              </button>
-            </div>
-          )}
+          <button
+            onClick={handleReschedule}
+            className="group/btn relative hover:z-50 text-gray-400 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 p-2 rounded-full transition-colors focus:outline-none"
+          >
+            <CalendarClock size={16} />
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[11px] rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-sm">
+              Reschedule Campaign
+            </span>
+          </button>
+
+          <button
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="group/btn relative hover:z-50 text-gray-400 hover:text-red-600 bg-gray-50 hover:bg-red-50 p-2 rounded-full transition-colors focus:outline-none"
+          >
+            <Trash2 size={16} />
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[11px] rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-sm">
+              Delete Campaign
+            </span>
+          </button>
         </div>
       </div>
 
@@ -251,7 +275,7 @@ export default function CampaignCard({ campaign }) {
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-3 gap-3 bg-gray-50/50 rounded-xl p-4 border border-gray-100">
-        <div className="flex flex-col">
+        <div className="flex flex-col p-2 -m-2 rounded-lg hover:bg-white hover:shadow-sm hover:scale-105 transition-all cursor-default">
           <div className="flex items-center gap-1.5 text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1.5">
             <Users size={14} /> Targets
           </div>
@@ -260,20 +284,20 @@ export default function CampaignCard({ campaign }) {
           </span>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col p-2 -m-2 rounded-lg hover:bg-white hover:shadow-sm hover:scale-105 transition-all cursor-default group/metric">
           <div className="flex items-center gap-1.5 text-xs text-green-600 font-semibold uppercase tracking-wider mb-1.5">
             <CheckCircle2 size={14} /> Sent
           </div>
-          <span className="text-xl font-bold text-gray-900">
+          <span className="text-xl font-bold text-gray-900 group-hover/metric:text-green-700 transition-colors">
             {(campaign.sent || 0).toLocaleString()}
           </span>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col p-2 -m-2 rounded-lg hover:bg-white hover:shadow-sm hover:scale-105 transition-all cursor-default group/metric">
           <div className="flex items-center gap-1.5 text-xs text-red-500 font-semibold uppercase tracking-wider mb-1.5">
             <XCircle size={14} /> Failed
           </div>
-          <span className="text-xl font-bold text-gray-900">
+          <span className="text-xl font-bold text-gray-900 group-hover/metric:text-red-700 transition-colors">
             {(campaign.failed || 0).toLocaleString()}
           </span>
         </div>
@@ -326,6 +350,49 @@ export default function CampaignCard({ campaign }) {
         cancelText="Cancel"
         isDestructive={true}
       />
+    </div>
+  );
+}
+
+export function CampaignCardSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-6 flex flex-col gap-5 animate-pulse">
+      {/* Header Section */}
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-5 bg-gray-200 rounded w-16 ml-2"></div>
+          </div>
+          <div className="flex items-center gap-4 mt-3">
+            <div className="h-4 bg-gray-200 rounded w-32"></div>
+            <div className="h-4 bg-gray-200 rounded w-32"></div>
+          </div>
+        </div>
+        <div className="flex gap-2 ml-4">
+          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="my-1 mt-4">
+        <div className="flex justify-between text-sm mb-2">
+          <div className="h-4 bg-gray-200 rounded w-16"></div>
+          <div className="h-4 bg-gray-200 rounded w-8"></div>
+        </div>
+        <div className="w-full bg-gray-100 rounded-full h-2"></div>
+      </div>
+
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-3 gap-3 bg-gray-50/50 rounded-xl p-4 border border-gray-100 mt-2">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex flex-col p-2">
+            <div className="h-4 bg-gray-200 rounded w-16 mb-2"></div>
+            <div className="h-6 bg-gray-200 rounded w-10"></div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
