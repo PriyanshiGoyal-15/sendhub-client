@@ -111,7 +111,24 @@ export default function AddContactModal({ onClose }) {
       addToast("Contact added successfully", "success");
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to create contact");
+      let errorMessage =
+        err.response?.data?.message || "Failed to create contact";
+
+      // Make MongoDB duplicate key errors user-friendly
+      if (
+        errorMessage.includes("E11000") ||
+        errorMessage.includes("duplicate key")
+      ) {
+        if (errorMessage.includes("phone")) {
+          errorMessage = "A contact with this phone number already exists.";
+        } else if (errorMessage.includes("email")) {
+          errorMessage = "A contact with this email already exists.";
+        } else {
+          errorMessage = "This contact already exists.";
+        }
+      }
+
+      setError(errorMessage);
     } finally {
       setSaving(false);
     }
