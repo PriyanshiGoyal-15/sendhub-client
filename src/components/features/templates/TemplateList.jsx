@@ -5,9 +5,10 @@ import TemplateCard from "./TemplateCard";
 import TemplatePreview from "./TemplatePreview";
 import TemplateModal from "./TemplateModal";
 import DeleteModal from "./DeleteModal";
-import toast from "react-hot-toast";
+import { useToast } from "../../../components/UI/toast";
 
 export default function TemplateList() {
+  const { addToast } = useToast();
   const {
     templates,
     loading,
@@ -50,17 +51,17 @@ export default function TemplateList() {
     try {
       if (templateToEdit) {
         await updateTemplate(templateToEdit._id, data);
-        toast.success("Template updated successfully");
+        addToast("Template updated successfully", "success");
         if (selectedTemplate?._id === templateToEdit._id) {
           setSelectedTemplate({ ...selectedTemplate, ...data });
         }
       } else {
         await createTemplate(data);
-        toast.success("Template created successfully");
+        addToast("Template created successfully", "success");
       }
       setIsModalOpen(false);
     } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      addToast(error.message || "Something went wrong", "error");
     }
   };
 
@@ -68,14 +69,14 @@ export default function TemplateList() {
     if (!templateToDelete) return;
     try {
       await deleteTemplate(templateToDelete._id);
-      toast.success("Template deleted successfully");
+      addToast("Template deleted successfully", "success");
       if (selectedTemplate?._id === templateToDelete._id) {
         setSelectedTemplate(null);
       }
       setIsDeleteModalOpen(false);
       setTemplateToDelete(null);
     } catch (error) {
-      toast.error(error.message || "Failed to delete template");
+      addToast(error.message || "Failed to delete template", "error");
     }
   };
 
