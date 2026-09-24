@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import LandingPage from "./LandingPage";
 import Register from "./(auth)/register";
 import Login from "./(auth)/login";
 import ForgotPassword from "./(auth)/forgetPassword";
@@ -22,20 +23,26 @@ import DashboardHome from "./(dashboard)/dashboard/page";
 function App() {
   return (
     <Routes>
+      {/* Public landing page — shown first to all visitors */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/landing" element={<LandingPage />} />
+
+      {/* Auth routes */}
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgetPassword" element={<ForgotPassword />} />
       <Route path="/verifyOTP" element={<VerifyOTP />} />
       <Route path="/resetPassword" element={<ResetPassword />} />
+
+      {/* Protected dashboard under /app */}
       <Route
-        path="/"
+        path="/app"
         element={
           <ProtectedRoute>
             <DashboardLayout />
           </ProtectedRoute>
         }
       >
-        {/* Child routes for the dashboard */}
         <Route index element={<DashboardHome />} />
         <Route path="contacts" element={<Contacts />} />
         <Route path="campaigns" element={<Campaigns />} />
@@ -46,7 +53,9 @@ function App() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="settings" element={<Settings />} />
       </Route>
-      <Route path="*" element={<Navigate to="/register" replace />} />
+
+      {/* Catch-all → landing */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

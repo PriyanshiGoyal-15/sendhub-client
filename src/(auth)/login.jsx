@@ -37,7 +37,7 @@ function Login() {
     try {
       await login(email, password, rememberMe);
       addToast("Successfully logged in!", "success");
-      navigate("/");
+      navigate("/app");
     } catch (err) {
       addToast(
         err.response?.data?.error?.message || "Failed to log in",

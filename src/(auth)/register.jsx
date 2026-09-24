@@ -28,7 +28,7 @@ function Register() {
     try {
       await register(name, email, password);
       addToast("Successfully registered!", "success");
-      navigate("/");
+      navigate("/app");
     } catch (err) {
       const errMsg = err.response?.data?.error?.message || "Failed to register";
       setError(errMsg);

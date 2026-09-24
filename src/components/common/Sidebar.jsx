@@ -15,13 +15,13 @@ import {
 } from "react-icons/md";
 
 const navItems = [
-  { name: "Dashboard", path: "/", icon: MdOutlineDashboard },
-  { name: "Contacts", path: "/contacts", icon: MdOutlineContacts },
-  { name: "Campaigns", path: "/campaigns", icon: MdOutlineCampaign },
-  { name: "Templates", path: "/templates", icon: MdOutlineDescription },
-  // { name: "Inbox", path: "/inbox", icon: MdOutlineChat },
-  // { name: "Analytics", path: "/analytics", icon: MdOutlineAnalytics },
-  { name: "Settings", path: "/settings", icon: MdOutlineSettings },
+  { name: "Dashboard", path: "/app", icon: MdOutlineDashboard },
+  { name: "Contacts", path: "/app/contacts", icon: MdOutlineContacts },
+  { name: "Campaigns", path: "/app/campaigns", icon: MdOutlineCampaign },
+  { name: "Templates", path: "/app/templates", icon: MdOutlineDescription },
+  // { name: "Inbox", path: "/app/inbox", icon: MdOutlineChat },
+  // { name: "Analytics", path: "/app/analytics", icon: MdOutlineAnalytics },
+  { name: "Settings", path: "/app/settings", icon: MdOutlineSettings },
 ];
 
 function Sidebar({ isMobileOpen, setIsMobileOpen }) {
@@ -104,7 +104,8 @@ function Sidebar({ isMobileOpen, setIsMobileOpen }) {
             {navItems.map((item) => {
               const isActive =
                 location.pathname === item.path ||
-                (item.path !== "/" && location.pathname.startsWith(item.path));
+                (item.path !== "/app" &&
+                  location.pathname.startsWith(item.path));
               return (
                 <Link
                   key={item.name}
